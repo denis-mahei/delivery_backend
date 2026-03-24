@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Shop {
+  id       Int       @id @default(autoincrement())
+  name     String
+  imageUrl String?
+  rating   Float     @default(0)
+  products Product[]
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id         Int         @id @default(autoincrement())
+  name       String
+  price      Float
+  imageUrl   String?
+  shopId     Int
+  categoryId Int
+  shop       Shop        @relation(fields: [shopId], references: [id])
+  category   Category    @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  name       String
+  email      String
+  phone      String
+  address    String
+  totalPrice Float
+  createdAt  DateTime    @default(now())
+  couponId   Int?
+  coupon     Coupon?     @relation(fields: [couponId], references: [id])
+  items      OrderItem[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Coupon {
+  id       Int     @id @default(autoincrement())
+  name     String
+  code     String  @unique
+  discount Float
+  imageUrl String?
+  orders   Order[]
+}
