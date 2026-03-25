@@ -1,7 +1,7 @@
 import express from "express";
 import {
 	createOrder,
-	filteringByRating,
+	filteringByRating, getOrders,
 	listProductsByCategory,
 	listProductsByShop,
 	listShops,
@@ -13,8 +13,9 @@ const router = express.Router();
 router.get("/shops", listShops)
 router.get("/shops/filter-by-rating", filteringByRating)
 router.get("/products", sortByParams)
+router.get("/orders", getOrders)
+router.post("/orders", createOrder)
 router.get("/shops/:id", listProductsByShop)
 router.get("/products/category/:id", listProductsByCategory)
-router.post("/orders", createOrder)
 
 export default router;
