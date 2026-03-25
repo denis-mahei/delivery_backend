@@ -156,20 +156,26 @@ export const createOrder = async ( req: Request, res: Response ) => {
 	}
 }
 export const getOrders = async ( req: Request, res: Response ) => {
-	const { email, phone } = req.query
+	try {
+		const { email, phone } = req.query
 
-	if (!email || !phone) {
-		return res.status(400).json({ error: "Email and phone is required" })
-	}
-
-	const order = await prisma.order.findMany({
-		where: {
-			email: email as string,
-			phone: phone as string,
-		},
-		include: {
-			items: true
+		if (!email || !phone) {
+			return res.status(400).json({ error: "Email and phone is required" })
 		}
-	})
-	res.status(200).json(order)
+
+		const order = await prisma.order.findMany({
+			where: {
+				email: email as string,
+				phone: phone as string,
+			},
+			include: {
+				items: true
+			}
+		})
+		res.status(200).json(order)
+	} catch (e) {
+		if (e instanceof Error) {
+			return res.status(500).json({ error: e.message })
+		}
+	}
 }
