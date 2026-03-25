@@ -61,13 +61,25 @@ export const listProductsByCategory = async ( req: Request, res: Response ) => {
 }
 
 export const sortByParams = async ( req: Request, res: Response ) => {
-	const { sort = 'price', order = 'asc' } = req.query
+	try {
+		const { sort = 'price', order = 'asc' } = req.query
 
-	const sortedProducts = await prisma.product.findMany({
-		orderBy: { [ sort as string ]: order as 'asc' | 'desc' }
-	})
+		const allowedSorts = ['price', 'name']
+		const allowedOrders = ['asc', 'desc']
 
-	res.status(200).json(sortedProducts)
+		if (!allowedSorts.includes(sort as string) || !allowedOrders.includes(sort as string)) {
+			return res.status(400).json({ error: "Invalid sort params!" })
+		}
+
+		const sortedProducts = await prisma.product.findMany({
+			orderBy: { [ sort as string ]: order as 'asc' | 'desc' }
+		})
+
+		res.status(200).json(sortedProducts)
+
+	} catch (e) {
+		return res.status(500).json({ error: "Something went wrong" })
+	}
 }
 export const filteringByRating = async ( req: Request, res: Response ) => {
 	try {
