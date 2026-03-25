@@ -66,7 +66,7 @@ export const sortByParams = async ( req: Request, res: Response ) => {
 		const allowedSorts = ['price', 'name']
 		const allowedOrders = ['asc', 'desc']
 
-		if (!allowedSorts.includes(sort as string) || !allowedOrders.includes(sort as string)) {
+		if (!allowedSorts.includes(sort as string) || !allowedOrders.includes(order as string)) {
 			return res.status(400).json({ error: "Invalid sort params!" })
 		}
 
