@@ -99,3 +99,59 @@ export const filteringByRating = async ( req: Request, res: Response ) => {
 		return res.status(500).json({ error: "Something went wrong" });
 	}
 }
+
+export const createOrder = async ( req: Request, res: Response ) => {
+	try {
+		const { name, email, phone, address, items } = req.body
+
+		if (!name || !email || !phone || !address || !items?.length) {
+			return res.status(400).json({ error: "All fields are required" })
+		}
+
+		const products = await prisma.product.findMany({
+			where: {
+				id: {
+					in: items.map(( item: any ) => item.productId)
+				}
+			}
+		})
+
+		const totalPrice = items.reduce(( sum: number, item: any ) => {
+			const product = products.find(p => p.id === item.productId)
+
+			if (!product) return sum;
+
+			sum += product.price * item.quantity;
+			return sum;
+		}, 0)
+
+		const newOrder = await prisma.order.create({
+			data: {
+				name,
+				email,
+				address,
+				phone,
+				totalPrice,
+				items: {
+					create: items.map(( item: any ) => {
+						const product = products.find(p => p.id === item.productId)
+						return {
+							productId: product?.id,
+							quantity: item.quantity,
+							price: product?.price
+						}
+					})
+				}
+			},
+			include: {
+				items: true
+			}
+
+		})
+		res.status(201).json(newOrder)
+	} catch (err) {
+		if (err instanceof Error) {
+			return res.status(500).json({ error: err.message })
+		}
+	}
+}
