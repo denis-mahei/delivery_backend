@@ -18,6 +18,7 @@ yarn-error.log*
 *.sqlite
 *.db
 *.test.js
+prisma/seed.ts
 # Optional editor folders
 .vscode/
 .idea/
